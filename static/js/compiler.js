@@ -122,7 +122,20 @@ async function compileContract() {
             })
         });
 
+        console.log("Enviando código para o Render:", processedContract);
 
+        const compileResponse = await fetch('https://backend-aca4.onrender.com/api/compile', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                code: processedContract, // Certifique-se de que o backend espera 'code' ou 'sourceCode'
+                contractName: contractName,
+                enableOptimization: enableOptimization,
+                optimizationRuns: optimizationRuns
+            })
+        });
         
         const result = await compileResponse.json();
         
