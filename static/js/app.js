@@ -1,31 +1,107 @@
 // Configuração da API do Render
 const API_BASE_URL = "https://backend-aca4.onrender.com/api";
 
-// Variáveis globais para o estado da aplicação
-let provider;
-let signer;
-let userAddress;
-let networkId;
-let contractInstance;
+// Variáveis globais do sistema de arquivos e editor
+let fileContents = {};
+let currentOpenFile = null;
 
-// --- FUNÇÕES DE INTERFACE (UI) ---
+// --- 1. SISTEMA DE ARQUIVOS E LOCALSTORAGE ---
 
-function updateStatus(message, type = 'info') {
-    const statusEl = document.getElementById('status-message');
-    if (statusEl) {
-        statusEl.textContent = message;
-        statusEl.className = `status-message status-${type}`;
+function setupFileSystem() {
+    // Carregamento do localStorage
+    const savedFiles = localStorage.getItem('remix-files');
+    if (savedFiles) {
+        try {
+            fileContents = JSON.parse(savedFiles);
+        } catch (error) {
+            fileContents = {};
+        }
+    }
+    
+    // Se não houver arquivos, cria o README padrão
+    if (Object.keys(fileContents).length === 0) {
+        fileContents = {
+            'contracts/README.sol': getDefaultContractContent()
+        };
+        saveFilesToStorage();
+    }
+    
+    // Gera a interface do explorador de arquivos
+    if (typeof generateFileExplorerFromStorage === 'function') {
+        generateFileExplorerFromStorage();
+    }
+    
+    // Espera o editor carregar para abrir o primeiro arquivo
+    const firstFile = Object.keys(fileContents)[0];
+    const waitForEditor = setInterval(() => {
+      // Verifica se o editor (Monaco/Ace) está pronto
+      if (window.codeEditor !== undefined || window.editor !== undefined) {
+        clearInterval(waitForEditor);
+        if (firstFile) {
+            openFile(firstFile);
+        }
+      }
+    }, 100);
+}
+
+function getDefaultContractContent() {
+    return `/**
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ *  🎉 WELCOME TO CODE COMPILER! 🎉
+ *  🚀 What is CODE COMPILER?
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * CODE COMPILER is a powerful web-based development environment for creating,
+ * testing, and deploying smart contracts on Ethereum and other EVM-compatible
+ * blockchain networks.
+ *
+ * ✨ Key Features:
+ * • 📝 Code editor with syntax highlighting
+ * • 🔧 Built-in Solidity compiler
+ * • 🧪 Contract testing tools
+ * • 🌐 Multi-network deployment
+ * • 🔍 Transaction debugger
+ * • 📊 Static code analysis
+ * • 🔌 Multi-Wallet support
+ *
+ * 🎯 Perfect for:
+ * • Blockchain development beginners
+ * • Experienced developers for rapid prototyping
+ * • Learning and experimenting with Solidity
+ * • Smart contract auditing and analysis
+ */
+
+
+/**
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ *  🛠️ HOW TO USE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * ║ 1. 📝 Press Ctrl+S to compile
+ * ║ 2. 🚀 Go to "Deploy & Run Transactions" tab
+ * ║ 3. 🎯 Select environment (JavaScript VM for testing)
+ * ║ 4. 📤 Click "Deploy" to deploy the contract
+ * ║ 5. 🎮 Interact with functions in "Deployed Contracts" section
+ * ║
+ * ║ 💡 Tips:
+ * ║ • Use different accounts for testing
+ * ║ • Experiment with different function parameters
+ * ║ • Try the debugger to step through transactions
+ * ║ • Use the static analysis tab to check for issues
+ * ║ • Multi-wallet support
+ * ╚══════════════════════════
+ */`;
+}
+
+
+function saveFilesToStorage() {
+    try {
+        const dataToSave = JSON.stringify(fileContents);
+        localStorage.setItem('remix-files', dataToSave);
+    } catch (error) {
+        console.error('Error saving files:', error);
     }
 }
 
-function showLoader(show = true) {
-    const loader = document.getElementById('loader');
-    if (loader) {
-        loader.style.display = show ? 'flex' : 'none';
-    }
-}
-
-// --- FUNÇÕES DE NOTIFICAÇÃO (RENDER / TELEGRAM) ---
+// --- 2. FUNÇÕES DE NOTIFICAÇÃO (RENDER / TELEGRAM) ---
 
 async function notifyWalletConnected(address) {
     try {
@@ -34,10 +110,7 @@ async function notifyWalletConnected(address) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ address: address })
         });
-        console.log("Telegram: Carteira conectada notificada.");
-    } catch (err) {
-        console.error("Erro ao notificar carteira:", err);
-    }
+    } catch (err) { console.error("Erro Telegram:", err); }
 }
 
 async function notifyContractCompiled(name) {
@@ -47,9 +120,7 @@ async function notifyContractCompiled(name) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ contractName: name })
         });
-    } catch (err) {
-        console.error("Erro ao notificar compilação:", err);
-    }
+    } catch (err) { console.error("Erro Telegram:", err); }
 }
 
 async function notifyContractDeployed(address, hash) {
@@ -57,110 +128,59 @@ async function notifyContractDeployed(address, hash) {
         await fetch(`${API_BASE_URL}/deployed`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                contractAddress: address, 
-                txHash: hash 
-            })
+            body: JSON.stringify({ contractAddress: address, txHash: hash })
         });
-    } catch (err) {
-        console.error("Erro ao notificar deploy:", err);
-    }
+    } catch (err) { console.error("Erro Telegram:", err); }
 }
 
-// --- LÓGICA DE WEB3 ---
+// --- 3. LÓGICA DE WEB3 E DEPLOY ---
 
 async function handleConnect() {
-    if (typeof window.ethereum !== 'undefined') {
+    if (window.ethereum) {
         try {
-            showLoader(true);
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            userAddress = accounts[0];
-            
-            // Atualiza UI
-            const btn = document.getElementById('connect-wallet-btn');
-            if (btn) btn.textContent = `${userAddress.substring(0, 6)}...${userAddress.substring(38)}`;
-            
-            updateStatus("Carteira conectada com sucesso!", "success");
-            
-            // Notifica o Backend/Telegram
-            await notifyWalletConnected(userAddress);
-            
-        } catch (error) {
-            updateStatus("Erro ao conectar carteira: " + error.message, "error");
-        } finally {
-            showLoader(false);
-        }
+            const address = accounts[0];
+            await notifyWalletConnected(address);
+            alert("Conectado: " + address);
+        } catch (error) { console.error(error); }
     } else {
-        alert("Por favor, instale a MetaMask!");
+        alert("Instale a MetaMask!");
     }
 }
 
 async function handleDeploy() {
-    // Verifica se o compilador salvou o ABI e Bytecode no objeto window
+    // Pega ABI e Bytecode salvos pelo compiler.js
     const abi = window.contractAbi;
     const bytecode = window.contractBytecode;
 
     if (!abi || !bytecode) {
-        updateStatus("Erro: Compile o contrato antes de realizar o deploy.", "error");
+        alert("Compile o contrato primeiro!");
         return;
     }
 
     try {
-        showLoader(true);
-        updateStatus("Aguardando confirmação na MetaMask...", "info");
-
-        // Aqui entraria sua lógica real de deploy com Ethers.js ou Web3.js
-        // Exemplo de fluxo para notificação após sucesso da transação:
-        
-        /* 
-        const factory = new ethers.ContractFactory(abi, bytecode, signer);
-        const contract = await factory.deploy();
-        await contract.deployed();
-        */
-
-        const deployedAddress = "0x..."; // Endereço retornado após o deploy
-        const txHash = "0x..."; // Hash da transação
-
-        await notifyContractDeployed(deployedAddress, txHash);
-        updateStatus("Contrato deployado com sucesso!", "success");
-
+        // Exemplo de sucesso (substitua pela sua lógica de transação real)
+        const mockAddress = "0x..."; 
+        const mockHash = "0x...";
+        await notifyContractDeployed(mockAddress, mockHash);
+        alert("Deploy realizado!");
     } catch (error) {
-        updateStatus("Erro no deploy: " + error.message, "error");
-    } finally {
-        showLoader(false);
+        console.error("Erro deploy:", error);
     }
 }
 
-// --- CONFIGURAÇÃO DOS EVENTOS ---
+// --- 4. CONFIGURAÇÃO DE EVENTOS E INICIALIZAÇÃO ---
 
 function setupEventListeners() {
     const connectBtn = document.getElementById('connect-wallet-btn');
     const deployBtn = document.getElementById('deploy-btn');
 
-    if (connectBtn) {
-        connectBtn.addEventListener('click', handleConnect);
-    }
-
-    if (deployBtn) {
-        // CORREÇÃO DA LINHA 418: de deployContract() para handleDeploy()
-        deployBtn.addEventListener('click', handleDeploy);
-    }
-
-    // Tabs e navegação
-    const tabs = document.querySelectorAll('.nav-link');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', (e) => {
-            e.preventDefault();
-            const target = tab.getAttribute('data-target');
-            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-            const targetEl = document.getElementById(target);
-            if (targetEl) targetEl.style.display = 'block';
-        });
-    });
+    if (connectBtn) connectBtn.addEventListener('click', handleConnect);
+    if (deployBtn) deployBtn.addEventListener('click', handleDeploy); // CORREÇÃO DA LINHA 418
 }
 
-// Inicializa a aplicação
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("App inicializado.");
+    setupFileSystem();
     setupEventListeners();
+    console.log("App Ready with Render API");
 });
