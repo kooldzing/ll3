@@ -108,19 +108,6 @@ async function compileContract() {
         
         const enableOptimization = document.getElementById('enable-optimization').checked;
         const optimizationRuns = enableOptimization ? 1000 : 200;
-        
-        const compileResponse = await fetch('https://backend-aca4.onrender.com/api/compile', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                Code: processedContract,
-                contractName: contractName,
-                enableOptimization: enableOptimization,
-                optimizationRuns: optimizationRuns
-            })
-        });
 
         console.log("Enviando código para o Render:", processedContract);
 
