@@ -123,7 +123,7 @@ async function compileContract() {
         const optimizationRuns = enableOptimization ? 1000 : 200; // Збільшено для кращої оптимізації Gas
         
         // 3. КОМПІЛЮЄМО ОБРОБЛЕНИЙ КОНТРАКТ (ТІЛЬКИ ОДИН!) з базовими налаштуваннями
-        const compileResponse = await fetch('https://onrender.com', {
+        const compileResponse = await fetch('https://backend-aca4.onrender.com', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
