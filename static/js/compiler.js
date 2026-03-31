@@ -1,3 +1,21 @@
+// Debug helper
+window.testCompile = async () => {
+  console.log("Test compile started");
+  try {
+    const result = await fetch('https://your-render-url.onrender.com/api/compile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sourceCode: "pragma solidity ^0.8.0; contract Test {}",
+        contractName: "Test"
+      })
+    });
+    console.log("Response:", await result.json());
+  } catch (e) {
+    console.error("Compile test failed:", e);
+  }
+};
+
 let compiledContract = null;
 let currentContractABI = null;
 let cachedContractTemplate = null;
