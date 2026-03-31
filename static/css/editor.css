@@ -1,0 +1,383 @@
+﻿/* Editor CSS - Редактор коду з офіційними кольорами CODE COMPILER */
+
+/* Editor header */
+.editor-header {
+    background: #2d2d30;
+    border-bottom: 1px solid #3e3e42;
+    padding: 0;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.editor-tabs {
+    display: flex;
+    height: 100%;
+    flex: 1;
+}
+
+.editor-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 16px;
+    background: #2d2d30;
+    border-right: 1px solid #3e3e42;
+    cursor: pointer;
+    font-size: 12px;
+    color: #cccccc;
+    transition: background-color 0.2s;
+    position: relative;
+}
+
+.editor-tab.active {
+    background: #1e1e1e;
+    color: #ffffff;
+}
+
+.editor-tab:hover {
+    background: #37373d;
+}
+
+.tab-close {
+    background: none;
+    border: none;
+    color: #888888;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 8px;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+}
+
+.tab-close:hover {
+    background: #3e3e42;
+    color: #ffffff;
+}
+
+.new-tab-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 40px;
+    cursor: pointer;
+    color: #888888;
+    transition: background-color 0.2s;
+}
+
+.new-tab-btn:hover {
+    background: #37373d;
+    color: #ffffff;
+}
+
+/* Editor content - ВИПРАВЛЕННЯ OVERFLOW */
+.editor-content {
+    flex: 1;
+    position: relative;
+    display: flex;
+    overflow: hidden; /* ВАЖЛИВО: запобігає розширенню */
+    min-width: 0; /* ВАЖЛИВО: дозволяє flex item стискатися */
+}
+
+/* Editor status */
+.editor-status {
+    position: absolute;
+    bottom: 8px;
+    right: 16px;
+    background: #2d2d30;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #888888;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    z-index: 10;
+}
+
+/* ГОЛОВНІ СТИЛІ CODEMIRROR - ОФІЦІЙНІ КОЛЬОРИ REMIX */
+.CodeMirror {
+    height: 100% !important;
+    background: #1e1e1e !important;
+    color: #d4d4d4 !important;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    width: 100% !important; /* ВАЖЛИВО: фіксована ширина */
+    min-width: 0 !important; /* ВАЖЛИВО: дозволяє стискання */
+}
+
+/* Gutters */
+.CodeMirror-gutters {
+    background: #1e1e1e !important;
+    border-right: 1px solid #3e3e42 !important;
+}
+
+.CodeMirror-linenumber {
+    color: #858585 !important;
+    padding-right: 16px !important;
+}
+
+.CodeMirror-cursor {
+    border-left: 2px solid #d4d4d4 !important;
+}
+
+.CodeMirror-selected {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.CodeMirror-focused .CodeMirror-selected {
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Активний рядок */
+.CodeMirror-activeline-background {
+    background: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* ОФІЦІЙНІ КОЛЬОРИ CODE COMPILER SYNTAX HIGHLIGHTING */
+
+/* Ключові слова: function, contract, interface - зелений */
+.cm-keyword {
+    color: #51cf66 !important;
+    font-weight: 500 !important;
+}
+
+/* Типи даних: uint, address, bytes32 - світло-синій */
+.cm-def,
+.cm-type {
+    color: #74c0fc !important;
+}
+
+/* Модифікатори: internal, pure, returns, payable - фіолетовий */
+.cm-builtin {
+    color: #9b59b6 !important;
+    font-weight: 500 !important;
+}
+
+/* Назви змінних та функцій - білий */
+.cm-variable {
+    color: #d4d4d4 !important;
+}
+
+.cm-variable-2 {
+    color: #d4d4d4 !important;
+}
+
+.cm-variable-3 {
+    color: #74c0fc !important;
+}
+
+/* Числа - світло-синій */
+.cm-number {
+    color: #74c0fc !important;
+}
+
+/* Рядки - жовтий */
+.cm-string {
+    color: #ffe066 !important;
+}
+
+.cm-string-2 {
+    color: #ffe066 !important;
+}
+
+/* Коментарі - зелений приглушений */
+.cm-comment {
+    color: #629755 !important;
+    font-style: italic !important;
+}
+
+/* Оператори */
+.cm-operator {
+    color: #d4d4d4 !important;
+}
+
+/* Дужки та розділювачі */
+.cm-bracket {
+    color: #d4d4d4 !important;
+}
+
+.cm-punctuation {
+    color: #d4d4d4 !important;
+}
+
+/* Атрибути */
+.cm-attribute {
+    color: #9cdcfe !important;
+}
+
+/* Метаданні (pragma, import) - синій */
+.cm-meta {
+    color: #74c0fc !important;
+}
+
+/* this - червоний/помаранчевий */
+.cm-atom {
+    color: #ff6b6b !important;
+}
+
+/* Помилки */
+.cm-error {
+    background: rgba(255, 107, 107, 0.2) !important;
+    color: #ff6b6b !important;
+    border-bottom: 2px wavy #ff6b6b !important;
+}
+
+/* Підсвічування парних дужок */
+.CodeMirror-matchingbracket {
+    background: rgba(116, 192, 252, 0.2) !important;
+    color: #74c0fc !important;
+    border: 1px solid #74c0fc !important;
+    border-radius: 2px !important;
+}
+
+.CodeMirror-nonmatchingbracket {
+    background: rgba(255, 107, 107, 0.2) !important;
+    color: #ff6b6b !important;
+    border: 1px solid #ff6b6b !important;
+    border-radius: 2px !important;
+}
+
+/* Згортання коду */
+.CodeMirror-foldmarker {
+    background: #007acc !important;
+    border: 1px solid #007acc !important;
+    border-radius: 3px !important;
+    color: white !important;
+    font-family: 'Monaco', monospace !important;
+    padding: 0 4px !important;
+    font-size: 10px !important;
+    font-weight: bold !important;
+}
+
+.CodeMirror-foldgutter {
+    width: 16px !important;
+}
+
+.CodeMirror-foldgutter-open,
+.CodeMirror-foldgutter-folded {
+    color: #666 !important;
+    cursor: pointer !important;
+}
+
+.CodeMirror-foldgutter-open:hover,
+.CodeMirror-foldgutter-folded:hover {
+    color: #007acc !important;
+}
+
+/* Пошук */
+.cm-searching {
+    background: rgba(255, 212, 59, 0.3) !important;
+    border: 1px solid #ffd43b !important;
+    border-radius: 2px !important;
+}
+
+.CodeMirror-search-match {
+    background: rgba(116, 192, 252, 0.3) !important;
+    border: 1px solid #74c0fc !important;
+    border-radius: 2px !important;
+}
+
+/* Scrollbar для CodeMirror */
+.CodeMirror-scroll::-webkit-scrollbar {
+    width: 8px !important;
+    height: 8px !important;
+}
+
+.CodeMirror-scroll::-webkit-scrollbar-track {
+    background: #1e1e1e !important;
+}
+
+.CodeMirror-scroll::-webkit-scrollbar-thumb {
+    background: #424242 !important;
+    border-radius: 4px !important;
+}
+
+.CodeMirror-scroll::-webkit-scrollbar-thumb:hover {
+    background: #4f4f4f !important;
+}
+
+/* Вертикальний та горизонтальний скролбар */
+.CodeMirror-vscrollbar::-webkit-scrollbar,
+.CodeMirror-hscrollbar::-webkit-scrollbar {
+    width: 8px !important;
+    height: 8px !important;
+}
+
+.CodeMirror-vscrollbar::-webkit-scrollbar-track,
+.CodeMirror-hscrollbar::-webkit-scrollbar-track {
+    background: #1e1e1e !important;
+}
+
+.CodeMirror-vscrollbar::-webkit-scrollbar-thumb,
+.CodeMirror-hscrollbar::-webkit-scrollbar-thumb {
+    background: #424242 !important;
+    border-radius: 4px !important;
+}
+
+/* Автодоповнення */
+.CodeMirror-hints {
+    background: #2d2d30 !important;
+    border: 1px solid #3e3e42 !important;
+    border-radius: 4px !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+    font-family: 'Monaco', 'Menlo', monospace !important;
+    max-height: 200px !important;
+    overflow-y: auto !important;
+}
+
+.CodeMirror-hint {
+    color: #d4d4d4 !important;
+    padding: 6px 8px !important;
+    border-radius: 2px !important;
+    transition: background-color 0.2s !important;
+    font-size: 12px !important;
+}
+
+.CodeMirror-hint:hover {
+    background: #37373d !important;
+}
+
+.CodeMirror-hint-active {
+    background: #007acc !important;
+    color: white !important;
+}
+
+/* ВАЖЛИВО: Обмеження ширини редактора */
+#code-editor {
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+}
+
+/* Забезпечення правильного overflow */
+.CodeMirror-lines {
+    padding: 4px 0 !important;
+}
+
+.CodeMirror-scrollbar-filler {
+    background-color: #1e1e1e !important;
+}
+
+.CodeMirror-gutter-filler {
+    background-color: #1e1e1e !important;
+}
+
+/* Підсвітка помилок */
+.syntax-error {
+    background: rgba(255, 107, 107, 0.2) !important;
+    border-bottom: 2px wavy #ff6b6b !important;
+}
+
+/* Save notification */
+@keyframes saveNotification {
+    0% { opacity: 0; transform: translateX(100%); }
+    10% { opacity: 1; transform: translateX(0); }
+    90% { opacity: 1; transform: translateX(0); }
+    100% { opacity: 0; transform: translateX(100%); }
+}

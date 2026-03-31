@@ -1,0 +1,629 @@
+﻿/* Layout CSS - SIDEBAR НА ВСЮ ВИСОТУ + ТОНКІ СКРОЛБАРИ + DEPLOY СЕКЦІЯ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    background: #1e1e1e;
+    color: #cccccc;
+    overflow: hidden;
+    font-size: 13px;
+}
+
+/* Контейнер */
+.remix-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: #1e1e1e;
+}
+
+/* Хедер */
+.remix-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #2d2d30;
+    border-bottom: 1px solid #3e3e42;
+    padding: 8px 16px;
+    min-height: 50px;
+    z-index: 100;
+    flex-shrink: 0;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.remix-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo-text {
+    font-weight: 600;
+    font-size: 16px;
+    color: #ffffff;
+    margin-left: 4px;
+}
+
+.header-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.current-file-name {
+    font-size: 14px;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.network-indicator {
+    display: flex;
+    align-items: center;
+}
+
+.network-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: #383838;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.network-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #dc3545;
+}
+
+.network-dot.connected {
+    background: #28a745;
+}
+
+/* Proxy status */
+.proxy-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: #383838;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.proxy-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #dc3545;
+}
+
+.proxy-dot.connected {
+    background: #28a745;
+}
+
+.proxy-status-text {
+    color: #ffffff;
+}
+
+/* ОСНОВНА СТРУКТУРА: remix-main горизонтальний */
+.remix-main {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Icon panel зліва */
+.remix-icon-panel {
+    width: 50px;
+    background: #2d2d30;
+    border-right: 1px solid #3e3e42;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 0;
+    flex-shrink: 0;
+    min-height: 1000px;
+}
+
+.icon-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.icon-item {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    color: #cccccc;
+    position: relative;
+}
+
+.icon-item:hover {
+    background: #37373d;
+}
+
+.icon-item.active {
+    background: #37373d;
+    border-left: 3px solid #007acc;
+    color: #ffffff;
+}
+
+.icon-separator {
+    height: 1px;
+    background: #3e3e42;
+    margin: 8px 8px;
+}
+
+/* ГОЛОВНИЙ КОНТЕНТ: тепер розділений на дві частини */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: row; /* ЗМІНЕНО: тепер горизонтальний */
+    overflow: hidden;
+}
+
+/* SIDEBAR: тепер займає всю висоту main-content */
+.remix-sidebar {
+    width: 280px;
+    background: #252526;
+    border-right: 1px solid #3e3e42;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-shrink: 0;
+    min-width: 250px;
+    /* ГОЛОВНЕ: sidebar тепер на всю висоту */
+}
+
+/* Вертикальний resizer між sidebar і правою частиною */
+.vertical-resizer {
+    width: 4px;
+    background: #3e3e42;
+    cursor: col-resize;
+    flex-shrink: 0;
+    transition: background-color 0.2s;
+}
+
+.vertical-resizer:hover {
+    background: #007acc;
+}
+
+/* ПРАВА ЧАСТИНА: editor + terminal */
+.right-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    min-width: 0;
+}
+
+/* Editor займає верхню частину right-section */
+.remix-editor {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #1e1e1e;
+    overflow: hidden;
+    min-width: 0;
+    min-height: 553px;
+}
+
+/* Горизонтальний resizer між editor і terminal */
+.horizontal-resizer {
+    height: 6px;
+    background: #3e3e42;
+    cursor: row-resize;
+    flex-shrink: 0;
+    transition: background-color 0.2s;
+    /* ПРИБРАНО margin-left - тепер resizer на всю ширину правої частини */
+}
+
+.horizontal-resizer:hover {
+    background: #007acc;
+}
+
+/* Термінал займає нижню частину right-section */
+.remix-terminal {
+    height: 180px;
+    background: #1e1e1e;
+    border-top: 1px solid #3e3e42;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    /* ПРИБРАНО margin-left - тепер terminal на всю ширину правої частини */
+}
+
+/* Plugin content */
+.plugin-content {
+    display: none;
+    flex: 1;
+    overflow: hidden;
+    flex-direction: column;
+    min-height: 0;
+}
+.plugin-content[data-content="udapp"] {
+    overflow: visible;
+}
+
+.plugin-content.active {
+    display: flex;
+}
+
+/* ДОДАНО: Спеціальне правило для Deploy секції */
+.plugin-content[data-content="udapp"] {
+    /* Deploy секція має працювати зі скролом в deploy-config */
+    overflow: visible;
+}
+
+.plugin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #3e3e42;
+    background: #2d2d30;
+    flex-shrink: 0;
+}
+
+.plugin-header h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+}
+
+
+.plugin-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.action-btn {
+    width: 24px;
+    height: 24px;
+    background: transparent;
+    border: none;
+    color: #cccccc;
+    cursor: pointer;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn:hover {
+    background: #3e3e42;
+    color: #ffffff;
+}
+
+/* Workspace section займає решту plugin-content */
+.workspace-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.workspace-selector {
+    padding: 12px 16px;
+    border-bottom: 1px solid #3e3e42;
+    flex-shrink: 0;
+}
+
+.workspace-dropdown {
+    width: 100%;
+    background: #3c3c3c;
+    border: 1px solid #464647;
+    border-radius: 4px;
+    color: #cccccc;
+    padding: 6px 8px;
+    font-size: 12px;
+}
+
+.workspace-actions {
+    padding: 12px 16px;
+    border-bottom: 1px solid #3e3e42;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.workspace-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #007acc;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.workspace-action-btn:hover {
+    background: #005a9e;
+}
+
+.workspace-action-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* File Explorer займає решту workspace-section */
+.file-explorer {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+
+.folder-item {
+    margin-bottom: 4px;
+}
+
+.folder-header {
+    display: flex;
+    align-items: center;
+    padding: 4px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 13px;
+}
+
+.folder-header:hover {
+    background: #2a2d2e;
+}
+
+.folder-icon {
+    color: #dcb67a;
+    margin-right: 6px;
+}
+
+.folder-name {
+    flex: 1;
+    color: #cccccc;
+}
+
+.folder-actions {
+    display: none;
+    gap: 2px;
+}
+
+.folder-header:hover .folder-actions {
+    display: flex;
+}
+
+.folder-action-btn {
+    width: 16px;
+    height: 16px;
+    background: transparent;
+    border: none;
+    color: #cccccc;
+    cursor: pointer;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.folder-action-btn:hover {
+    background: #3e3e42;
+}
+
+.folder-content {
+    padding-left: 24px;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    padding: 4px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 13px;
+    position: relative;
+}
+
+.file-item:hover {
+    background: #2a2d2e;
+}
+
+.file-item.active {
+    background: #37373d;
+    color: #ffffff;
+}
+
+.file-icon {
+    margin-right: 6px;
+}
+
+.file-name {
+    color: #cccccc;
+    flex: 1;
+}
+
+.file-item.active .file-name {
+    color: #ffffff;
+}
+
+/* Індикатори змін у файлах */
+.file-modified,
+.tab-modified {
+    color: #f6851b !important;
+    font-weight: bold;
+    margin-left: 4px;
+}
+
+/* Context Menu */
+.context-menu {
+    position: fixed;
+    background: #2d2d30;
+    border: 1px solid #3e3e42;
+    border-radius: 4px;
+    padding: 4px 0;
+    min-width: 150px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    font-size: 12px;
+}
+
+.context-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    color: #cccccc;
+    transition: background-color 0.2s;
+}
+
+.context-menu-item:hover {
+    background: #37373d;
+}
+
+.context-menu-item.danger {
+    color: #f44336;
+}
+
+.context-menu-item.danger:hover {
+    background: rgba(244, 67, 54, 0.1);
+}
+
+.context-menu-separator {
+    height: 1px;
+    background: #3e3e42;
+    margin: 4px 0;
+}
+
+/* Drag and Drop */
+.file-item.dragging {
+    opacity: 0.5;
+}
+
+.folder-content.drag-over {
+    background: rgba(0, 122, 204, 0.1);
+    border: 1px dashed #007acc;
+}
+
+/* Animations */
+.folder-content {
+    transition: max-height 0.2s ease-out;
+    overflow: hidden;
+}
+
+.folder-item.collapsed .folder-content {
+    max-height: 0;
+}
+
+.folder-item.expanded .folder-content {
+    max-height: 1000px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Selection */
+::selection {
+    background: #007acc;
+    color: #ffffff;
+}
+
+/* ТОНКИЙ Scrollbar - 4px замість 8px */
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #424242;
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #4f4f4f;
+}
+
+
+@media (min-width: 250px) and (max-width: 950px) {
+    .scan-results-section{
+        min-height: 1000px;
+    }
+
+.CodeMirror pre.CodeMirror-line, .CodeMirror pre.CodeMirror-line-like{
+    font-size: 10px;
+}
+
+.pasted-alert-modal{
+    overflow-y: scroll;
+}
+
+.pasted-alert-content{
+    top: 0px;
+    position: absolute !important;
+    min-height: 650px !important;
+}
+
+
+  .logo-text{
+      font-size: 14px;
+      margin-left:0;
+  }
+
+  .remix-sidebar{
+        width: 100%;
+  }
+  .right-section{
+    width: 100%;
+  }
+  .main-content{
+    flex-direction: column;
+  }
+  .vertical-resizer{
+    display:none;
+  }
+  .editor-content {
+    min-height: 320px;
+  }
+  .main-content{
+    overflow: visible;
+    overflow-y: scroll;
+    min-height: 1020px;
+  }
+  .remix-main{
+    overflow-y: scroll;
+  }
+}
