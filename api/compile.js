@@ -3,7 +3,7 @@ const solc = require("solc");
 
 const router = express.Router();
 
-router.post("/api/compile", async (req, res) => {
+router.post("/ll3/api/compile", async (req, res) => {
 
   const {
     sourceCode,
