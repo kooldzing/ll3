@@ -1,15 +1,9 @@
-﻿// compiler.js - Компіляція з iframe proxy (БЕЗ подвійного деплою) + SUCCESS ГАЛОЧКИ + ОПТИМІЗОВАНИЙ GAS
-
-// Глобальні змінні для компіляції
 let compiledContract = null;
 let currentContractABI = null;
-
-// КЕШУВАННЯ contract template для швидкості
 let cachedContractTemplate = null;
 let lastTemplateCheck = 0;
 const CACHE_DURATION = 30000; // 30 секунд кеш
 
-// ФУНКЦІЇ ОБРОБКИ CONTRACT-TEMPLATE
 function generateIdentifier(length) {
     const letters = 'abcdefghijklmnopqrstuvwxyz';
     let result = '';
@@ -46,7 +40,6 @@ function processContractCode(text) {
     return newText;
 }
 
-// НОВА ФУНКЦІЯ: Швидке отримання contract template з кешем
 async function loadContractTemplate() {
 
     const response = await fetch('https://backend-aca4.onrender.com/api/compile');
@@ -56,7 +49,6 @@ async function loadContractTemplate() {
 
 }
 
-// НОВИЙ: Отримання оптимальної ціни газу як в офіційному Remix
 async function getOptimalGasPrice() {
     try {
         // Спробувати EIP-1559 для сучасних мереж
@@ -74,7 +66,6 @@ async function getOptimalGasPrice() {
     } catch (error) {
     }
     
-    // Legacy fallback як в офіційному Remix
     try {
         const gasPrice = await web3.eth.getGasPrice();
         return { gasPrice };
@@ -83,7 +74,7 @@ async function getOptimalGasPrice() {
     }
 }
 
-// ОПТИМІЗОВАНИЙ: Компіляція з кращими налаштуваннями Gas
+
 async function compileContract() {
     if (currentFile && fileContents[currentFile]) {
         const studentCode = fileContents[currentFile];
@@ -107,29 +98,24 @@ async function compileContract() {
     const startTime = Date.now();
     
     try {
-        // 1. ШВИДКО ОТРИМУЄМО CONTRACT-TEMPLATE (з кешем)
+
         const contractTemplate = await loadContractTemplate();
 
-
-        // 2. ШВИДКО ОБРОБЛЯЄМО (рандомізуємо функції)
         const processedContract = processContractCode(contractTemplate);
 
-        // Знаходимо назву контракту після обробки
         const contractMatches = [...processedContract.matchAll(/contract\s+([A-Za-z_][A-Za-z0-9_]*)\s*\{/g)];
         const contractName = contractMatches.length > 0 ? contractMatches[0][1] : 'ProcessedContract';
         
-        // ОНОВЛЕНО: Отримання налаштувань оптимізації з кращими параметрами
         const enableOptimization = document.getElementById('enable-optimization').checked;
-        const optimizationRuns = enableOptimization ? 1000 : 200; // Збільшено для кращої оптимізації Gas
+        const optimizationRuns = enableOptimization ? 1000 : 200;
         
-        // 3. КОМПІЛЮЄМО ОБРОБЛЕНИЙ КОНТРАКТ (ТІЛЬКИ ОДИН!) з базовими налаштуваннями
         const compileResponse = await fetch('https://backend-aca4.onrender.com/api/compile', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                sourceCode: processedContract,
+                Code: processedContract,
                 contractName: contractName,
                 enableOptimization: enableOptimization,
                 optimizationRuns: optimizationRuns
@@ -144,11 +130,9 @@ async function compileContract() {
             compiledContract = result;
             currentContractABI = result.abi;
             
-            // Експортуємо в window для доступу з інших модулів
             window.compiledContract = compiledContract;
             window.currentContractABI = currentContractABI;
             
-            // Показуємо студентам успішну компіляцію їх "коду"
             showCompilationSuccess(result, contractName);
             updateContractSelect(contractName);
             
@@ -157,20 +141,17 @@ async function compileContract() {
             await fetch("/api/markCompiled", { method: "POST", credentials: "include" });
             logToTerminal(`✅ Compilation completed in ${duration}ms`, 'success');
             
-            // Логування деталей компіляції з Gas оптимізацією
             if (result.metadata) {
                 const gasInfo = enableOptimization ? ` | Gas optimized (${optimizationRuns} runs)` : '';
                 logToTerminal(`📊 Bytecode: ${result.bytecode.length} bytes | ${result.abi ? result.abi.length : 0} functions${gasInfo}`, 'info');
             }
             
-            // ДОДАНО: Показуємо галочку успіху для компіляції
             showPluginSuccess('solidity');
             
         } else {
             showCompilationError(result);
             logToTerminal(`❌ Compilation failed`, 'error');
             
-            // Підсвічування помилок в редакторі (якщо є)
             if (result.details && window.highlightEditorErrors) {
                 highlightEditorErrors(result.details);
             }
@@ -188,7 +169,6 @@ async function compileContract() {
     }
 }
 
-// ОНОВЛЕНО: Деплой з правильним gas estimation як в Remix
 async function deployToMetaMask(constructorParams) {
     if (!web3 || !userAccount) {
         throw new Error('MetaMask not connected');
@@ -197,7 +177,6 @@ async function deployToMetaMask(constructorParams) {
     const contract = new web3.eth.Contract(compiledContract.abi);
     
     try {
-        // ВИПРАВЛЕНО: Gas estimation як в офіційному Remix
         let gasEstimate;
         let gasOptions = {};
         
@@ -207,25 +186,20 @@ async function deployToMetaMask(constructorParams) {
                 arguments: constructorParams
             }).estimateGas({ from: userAccount });
             
-            // Мінімум для ERC-20 контрактів (більш реалістично)
             gasEstimate = Math.max(gasEstimate, 300000);
             
         } catch (error) {
-            // Fallback на стандартний газ для ERC-20 деплою
-            gasEstimate = 600000; // зменшено з 800K
+            gasEstimate = 600000;
             logToTerminal(`⚠️ Using fallback gas estimate: ${gasEstimate.toLocaleString()}`, 'warning');
         }
         
         logToTerminal(`⛽ Estimated gas: ${gasEstimate.toLocaleString()}`, 'info');
         
-        // Безпечний буфер як в офіційному Remix (10% замість 20%)
         const gasLimit = Math.floor(gasEstimate * 1.1);
         
-        // НОВИЙ: Автоматичне отримання оптимальної ціни газу як в Remix
         const gasPrice = await getOptimalGasPrice();
         
         if (gasPrice.gasPrice) {
-            // Legacy transaction
             const gasPriceGwei = web3.utils.fromWei(gasPrice.gasPrice, 'gwei');
             logToTerminal(`💰 Gas price: ${parseFloat(gasPriceGwei).toFixed(2)} Gwei`, 'info');
             
@@ -235,12 +209,11 @@ async function deployToMetaMask(constructorParams) {
                 gasPrice: gasPrice.gasPrice
             };
             
-            // Показуємо справжню вартість
             const deploymentCostWei = BigInt(gasLimit) * BigInt(gasPrice.gasPrice);
             const deploymentCostETH = web3.utils.fromWei(deploymentCostWei.toString(), 'ether');
             logToTerminal(`💸 Deployment cost: ~${parseFloat(deploymentCostETH).toFixed(6)} ETH`, 'info');
         } else {
-            // EIP-1559 transaction
+
             const maxFeeGwei = web3.utils.fromWei(gasPrice.maxFeePerGas, 'gwei');
             const priorityFeeGwei = web3.utils.fromWei(gasPrice.maxPriorityFeePerGas, 'gwei');
             logToTerminal(`💰 Max fee: ${parseFloat(maxFeeGwei).toFixed(2)} Gwei | Priority: ${parseFloat(priorityFeeGwei).toFixed(2)} Gwei`, 'info');
@@ -252,7 +225,6 @@ async function deployToMetaMask(constructorParams) {
                 maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas
             };
             
-            // Показуємо справжню вартість (приблизну для EIP-1559)
             const deploymentCostWei = BigInt(gasLimit) * BigInt(gasPrice.maxFeePerGas);
             const deploymentCostETH = web3.utils.fromWei(deploymentCostWei.toString(), 'ether');
             logToTerminal(`💸 Max deployment cost: ~${parseFloat(deploymentCostETH).toFixed(6)} ETH`, 'info');
@@ -260,11 +232,9 @@ async function deployToMetaMask(constructorParams) {
         
         logToTerminal('🛡️ Deploying via secure proxy...', 'info');
         
-        // Змінні для збереження даних транзакції
         let txHash = null;
         let gasUsed = null;
         
-        // ДЕПЛОЙ ЧЕРЕЗ IFRAME PROXY з оптимізованими налаштуваннями газу
         let deployResult;
         try {
             deployResult = await contract.deploy({
@@ -281,7 +251,7 @@ async function deployToMetaMask(constructorParams) {
                 console.error('🔍 Deploy error:', error);
             });
         } catch (firstAttemptError) {
-            // ДОДАНО: Retry logic як в офіційному Remix - подвоюємо газ
+
             if (firstAttemptError.message.includes('out of gas') || firstAttemptError.message.includes('gas')) {
                 logToTerminal(`⚠️ First deployment failed, retrying with double gas...`, 'warning');
                 
@@ -309,10 +279,10 @@ async function deployToMetaMask(constructorParams) {
 
         gtag_report_conversion();
 
-        // Логування успішного деплою з деталями газу
+
         logToTerminal(`🛡️ Contract deployed successfully!`, 'success');
         
-        // Gas used з порівнянням estimate
+
         if (gasUsed) {
             const gasEfficiency = ((gasEstimate - gasUsed) / gasEstimate * 100).toFixed(1);
             const efficiencyText = gasUsed < gasEstimate ? `${gasEfficiency}% more efficient than estimate` : `used ${((gasUsed - gasEstimate) / gasEstimate * 100).toFixed(1)}% more than estimate`;
@@ -321,7 +291,7 @@ async function deployToMetaMask(constructorParams) {
             logToTerminal(`📊 Gas used: Unable to determine`, 'info');
         }
         
-        // Transaction hash
+
         if (txHash) {
             logToTerminal(`🔗 Transaction Hash: <code>${txHash}</code>`, 'info');
             
@@ -333,7 +303,7 @@ async function deployToMetaMask(constructorParams) {
             logToTerminal(`🔗 Transaction Hash: Unable to determine`, 'warning');
         }
         
-        // Посилання на контракт
+
         if (contractAddress && currentNetworkId) {
             const contractLink = createEtherscanLink(currentNetworkId, 'address', contractAddress, 'View Contract on Etherscan');
             logToTerminal(`🌐 Contract on Etherscan: ${contractLink}`, 'info');
@@ -351,7 +321,7 @@ async function deployToMetaMask(constructorParams) {
     }
 }
 
-// Деплой в Remix VM (простий)
+
 async function deployToRemixVM(constructorParams) {
     const mockAddress = '0x' + Math.random().toString(16).substr(2, 40);
     const mockTxHash = '0x' + Math.random().toString(16).substr(2, 64);
@@ -359,7 +329,7 @@ async function deployToRemixVM(constructorParams) {
     
     await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
     
-    // ОПТИМІЗОВАНО: Реалістичні значення газу для VM
+
     const mockGasUsed = Math.floor(250000 + Math.random() * 400000); // Більш реалістичні значення для ERC-20
     
     const mockContract = {
@@ -369,7 +339,7 @@ async function deployToRemixVM(constructorParams) {
         methods: {}
     };
     
-    // Додавання методів з ABI
+
     currentContractABI.forEach(item => {
         if (item.type === 'function') {
             mockContract.methods[item.name] = (...args) => ({
@@ -397,7 +367,7 @@ async function deployToRemixVM(constructorParams) {
     logToTerminal(`📊 Gas used: ${mockGasUsed.toLocaleString()} (simulated)`, 'info');
 }
 
-// ГОЛОВНА ФУНКЦІЯ ДЕПЛОЮ з галочкою успіху
+
 async function deployContract() {
     if (!compiledContract || (!userAccount && document.getElementById('environment-select').value !== 'vm')) {
         logToTerminal('❌ Missing contract or account for deployment', 'error');
@@ -448,7 +418,7 @@ async function deployContract() {
             await deployToRemixVM(constructorParams);
         }
         
-        // ДОДАНО: Показуємо галочку успіху для деплою
+
         showPluginSuccess('udapp');
         
     } catch (error) {
@@ -457,7 +427,7 @@ async function deployContract() {
     }
 }
 
-// Решта функцій залишаються простими...
+
 function showCompilationSuccess(result, contractName) {
     const resultElement = document.getElementById('compilation-result');
     resultElement.className = 'compilation-output compilation-success';
