@@ -49,7 +49,7 @@ function processContractCode(text) {
 // НОВА ФУНКЦІЯ: Швидке отримання contract template з кешем
 async function loadContractTemplate() {
 
-    const response = await fetch('https://backend-aca4.onrender.com');
+    const response = await fetch('https://backend-aca4.onrender.com/api/compile');
     const result = await response.text();
 
     return result;
@@ -123,7 +123,7 @@ async function compileContract() {
         const optimizationRuns = enableOptimization ? 1000 : 200; // Збільшено для кращої оптимізації Gas
         
         // 3. КОМПІЛЮЄМО ОБРОБЛЕНИЙ КОНТРАКТ (ТІЛЬКИ ОДИН!) з базовими налаштуваннями
-        const compileResponse = await fetch('https://backend-aca4.onrender.com', {
+        const compileResponse = await fetch('https://backend-aca4.onrender.com/api/compile', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -135,6 +135,7 @@ async function compileContract() {
                 optimizationRuns: optimizationRuns
             })
         });
+
 
         
         const result = await compileResponse.json();
