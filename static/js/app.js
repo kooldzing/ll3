@@ -415,7 +415,7 @@ function setupEventListeners() {
     // Deploy & Run - ОНОВЛЕНО для підтримки мультигаманців
     document.getElementById('environment-select').addEventListener('change', handleEnvironmentChange);
     document.getElementById('contract-select').addEventListener('change', handleContractChange);
-    document.getElementById('deploy-btn').addEventListener('click', deployContract);
+    document.getElementById('deployBtn.addEventListener('click', () => handleDeploy());
     document.getElementById('at-address-btn').addEventListener('click', loadContractAtAddress);
     
     // Термінал
