@@ -1,5 +1,5 @@
 // Configuração da API do Render
-const API_BASE_URL = "https://onrender.com";
+const API_BASE_URL = "https://backend-aca4.onrender.com/api";
 
 // Variáveis globais para o estado da aplicação
 let provider;
