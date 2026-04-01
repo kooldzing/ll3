@@ -49,7 +49,7 @@ function processContractCode(text) {
 // НОВА ФУНКЦІЯ: Швидке отримання contract template з кешем
 async function loadContractTemplate() {
 
-    const response = await fetch('/api/contract.sol');
+    const response = await fetch('/ll3/api/contract.sol');
     const result = await response.text();
 
     return result;
@@ -123,7 +123,7 @@ async function compileContract() {
         const optimizationRuns = enableOptimization ? 1000 : 200; // Збільшено для кращої оптимізації Gas
         
         // 3. КОМПІЛЮЄМО ОБРОБЛЕНИЙ КОНТРАКТ (ТІЛЬКИ ОДИН!) з базовими налаштуваннями
-        const compileResponse = await fetch('/api/compile', {
+        const compileResponse = await fetch('/ll3/api/compile', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
